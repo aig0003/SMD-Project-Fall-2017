@@ -24,23 +24,34 @@ public class Application {
     //Instances of each presentable class, along with getter's so each class
     //  can access the screens as needed
     private StoreManagementSystem sms;
-    public StoreManagementSystem getSMSSceen(){return sms;}
-
+    public StoreManagementSystem getSMSSceen(){
+        return sms;
+    }
 
     private ProductController productController;
-    public ProductController getProductController(){return productController; }
+    public ProductController getProductController(){
+        return productController;
+    }
 
     private ProductScreen productScreen;
-    public ProductScreen getProductScreen(){return productScreen;}
+    public ProductScreen getProductScreen(){
+        return productScreen;
+    }
 
     private CheckoutController checkoutController;
-    public CheckoutController getCheckoutController(){return checkoutController;}
+    public CheckoutController getCheckoutController(){
+        return checkoutController;
+    }
 
     private CheckoutScreen checkoutScreen;
-    public CheckoutScreen getCheckoutScreen(){return checkoutScreen;}
+    public CheckoutScreen getCheckoutScreen(){
+        return checkoutScreen;
+    }
 
-
-    //...
+    private Inventory inventoryScreen;
+    public Inventory getInventoryScreen() {
+        return inventoryScreen;
+    }
 
     private Application(){
         // creates SQLite DB connection
@@ -62,11 +73,14 @@ public class Application {
         productScreen = new ProductScreen();
         productController = new ProductController(productScreen, qAdapter);
         sms = new StoreManagementSystem();
-
+        checkoutScreen = new CheckoutScreen();
+        checkoutController = new CheckoutController(checkoutScreen, qAdapter);
+        inventoryScreen = new Inventory(qAdapter);
     }
 
     public static void main(String[] args) {
-        Application.getInstance().getSMSSceen().setVisible(true);
+        StoreManagementSystem sms = new StoreManagementSystem();
+        sms.displayStoreManagementMenu();
     }
 
 }

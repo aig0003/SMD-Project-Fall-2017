@@ -1,6 +1,6 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
-import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,17 +23,18 @@ class Inventory {
 				exit();
 			}
 		});
-		exitButton.setBounds(475, 10, 100, 50); //(x, y, xSize, ySize)
+		exitButton.setBounds(500, 10, 75, 30); //(x, y, xSize, ySize)
 	}
 
 	public void MainInventoryPage(){
 
 	  	frame = new JFrame("Inventory");
 	  	frame.setSize(frameWidth, frameHeight);
+		frame.setResizable(false);
 
 	  	//Creates a button that allows the user to go back.
 	  	JButton backButton = new JButton("Back");
-	  	backButton.setBounds(10, 10, 100, 50);
+	  	backButton.setBounds(10, 10, 75, 30);
 	  	backButton.addActionListener(new ActionListener(){
 	  		public void actionPerformed(ActionEvent e){
 	  			frame.setVisible(false);
@@ -77,7 +78,11 @@ class Inventory {
 		addItemButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				frame.setVisible(false);
-				UpdateInventoryPage(-1);
+				try {
+					UpdateInventoryPage(-1);
+				} catch (Exception e2) {
+					e2.printStackTrace();
+				}
 			}
 		});
 
@@ -95,18 +100,20 @@ class Inventory {
 	public void ViewInventoryPage() {
 		frame = new JFrame("Inventory");
 		frame.setSize(frameWidth, frameHeight);
+		frame.setResizable(false);
 
 	  	//Creates a button that allows the user to go back.
 	  	JButton backButton = new JButton("Back");
-	  	backButton.setBounds(10, 10, 100, 50);
+	  	backButton.setBounds(10, 10, 75, 30);
 	  	backButton.addActionListener(new ActionListener(){
 	  		public void actionPerformed(ActionEvent e){
+	  			frame.setVisible(false);
 	  			MainInventoryPage();	
   			}
 	  	});
 
 		JLabel instructions = new JLabel("Choose an item to change it or view details.");
-		instructions.setBounds(150, 10, 400, 50);
+		instructions.setBounds(10, 50, 400, 50);
 		final Product[] productList = qa.getAll();
 
 		for (int i = 0; i < productList.length; i++)
@@ -114,14 +121,28 @@ class Inventory {
 			String itemName = productList[i].getName();
 			JButton newButton = new JButton(itemName);
 			final int currentOffset = i * 50;
-			newButton.setBounds(50, 100 + currentOffset, 200, 50);
+			final int currentIndex = i;
+			newButton.setBounds(75, 110 + currentOffset, 200, 30);
 			newButton.addActionListener(new ActionListener(){
 		  		public void actionPerformed(ActionEvent e){
 		  			frame.setVisible(false);
-		  			UpdateInventoryPage(productList[currentOffset / 50].getID());
+		  			UpdateInventoryPage(productList[currentIndex].getID());
 		  		}
 		  	});
+
+			JButton removeButton = new JButton("Remove");
+			removeButton.setBounds(325, 110 + currentOffset, 100, 30);
+			removeButton.setBackground(Color.pink);
+			removeButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					frame.setVisible(false);
+					qa.remove(productList[currentIndex].getID());
+					ViewInventoryPage(); //Refreshes the page.
+				}
+			});
+
 			frame.add(newButton);
+			frame.add(removeButton);
 		}
 
 		frame.setLayout(null);
@@ -133,33 +154,32 @@ class Inventory {
 
 	//Shows the screen that allows the user to update the data about a particular item. The itemID parameter is the id of the item that will be updated.
 	public void UpdateInventoryPage(final int itemID){
+
 		//Creates the frame for displayed info.
 		frame = new JFrame("Update/Add Item");
-	  	frame.setSize(frameWidth, frameHeight);
-
+		frame.setSize(frameWidth, frameHeight);
+		frame.setResizable(false);
 	  	final int numFields = 8; //There are 8 distinct data fields for each product.
 
-	  	QueryAdapter qa = Application.getInstance().getQuery();
-	  	final Product product = qa.loadProduct(itemID);
-
-	  	if (itemID == -1) {
-			//This only happens when you are adding a new item. To do this, sql will create an empty column and then proceed as normal.
+	  	if (itemID == -1) { //You are adding a new product.
+			UpdateInventoryPage(qa.updateProduct(null, itemID));
+			return;
 	  	}
 
+	  	final Product product = qa.loadProduct(itemID);
 		for (int i = 0; i < numFields; i++)
 		{
 			int verticalOffset = i * 50; //This is the height that the items will be placed at.
 			
 			//Creates a button associated with each section that allows you to change the various values.
+			final int dataNum = i;
 			final JButton changeButton = new JButton("Change");
-			final QueryAdapter innerQA = qa; //This is just a copy of the query adapter that each button has so that it doesnt complain about it being within an inner class.
-		  	changeButton.setBounds(50, 100 + verticalOffset, 100, 50);	
+			changeButton.setBounds(50, 110 + verticalOffset, 100, 30);
 		  	changeButton.addActionListener(new ActionListener(){
 		  		public void actionPerformed(ActionEvent e){
 		  			String newValue =  JOptionPane.showInputDialog("Enter a new value");
-		  			int dataNum = (changeButton.getBounds().y - 100) / 50; //I had trouble accessing a variable that would change later on and since this is based on the number, it just uses the y positioning to get the for loop iteration number.
-					setData(dataNum, product, newValue);
-		  			innerQA.saveProduct(product);
+		  			Product updatedProduct = setData(dataNum, product, newValue);
+		  			qa.updateProduct(updatedProduct, itemID);
 					frame.setVisible(false);
 		  			UpdateInventoryPage(itemID); //Refreshes the page so the new data is displayed.
 		  		}
@@ -167,12 +187,12 @@ class Inventory {
 		  	frame.add(changeButton);
 
 		  	JLabel fieldLabel = new JLabel(getLabel(i) + ":");
-		  	fieldLabel.setBounds(150, 100 + verticalOffset, 100, 50);
+		  	fieldLabel.setBounds(160, 100 + verticalOffset, 100, 50);
 		  	frame.add(fieldLabel);
 
 		  	//Adds the data for the field.
 		  	JLabel fieldValue = new JLabel(getData(i, product));
-	  		fieldValue.setBounds(250, 100 + verticalOffset, 350, 50);
+	  		fieldValue.setBounds(260, 100 + verticalOffset, 350, 50);
 	  		frame.add(fieldValue); 
 		}
 
@@ -186,6 +206,9 @@ class Inventory {
 	  	});
 	  	backToMenuButton.setBounds(25, 10, 200, 50);
 
+	  	JLabel dateInstructions = new JLabel("*Date is formatted as \"YYYY-MM-DD\"");
+	  	dateInstructions.setBounds(50, 500, 300, 50);
+	  	frame.add(dateInstructions);
 	  	//Resets the frame so it displays correctly.
 	  	frame.setLayout(null);
 	  	//Adds buttons
@@ -213,7 +236,7 @@ class Inventory {
 			case 6:
 				return "Measurement";
 			case 7:
-				return "Expiration Date";
+				return "Expiration Date*";
 			default:
 				System.out.println("Error!");
 				exit();
@@ -273,9 +296,11 @@ class Inventory {
 					product.setUnit(newValue);
 					break;
 				case 7:
-					DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+					DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 					try { //I really don't know why we need this try/catch block but it makes intellij happy.
-						product.setExpiration((Date)formatter.parse(newValue));
+						java.util.Date date = formatter.parse(newValue);
+						java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+						product.setExpiration(sqlDate);
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
@@ -290,13 +315,7 @@ class Inventory {
 		return product;
 	}
 
-	public String queryInventory(String query){
-		//Query SQL Here
-	  	System.out.println(query);
-	  	return query;
-	}
-
-	public void exit(){
+	private void exit(){
 		System.exit(0);
 	}
 }

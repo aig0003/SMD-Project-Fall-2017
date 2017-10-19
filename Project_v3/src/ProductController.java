@@ -87,7 +87,7 @@ public class ProductController implements ActionListener {
         product.setExpiration(productDate);
 
         //Stores the product to the database
-        qa.saveProduct(product);
+        qa.updateProduct(product, ID);
     }
 
     private void loadProduct() {

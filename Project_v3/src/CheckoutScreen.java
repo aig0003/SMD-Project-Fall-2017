@@ -1,68 +1,91 @@
-import javax.swing.*;
-public class CheckoutScreen extends JFrame{
-    private JTextField txtProductID  = new JTextField(10);
-    private JTextField txtProductName  = new JTextField(30);
-    private JTextField txtProductPrice  = new JTextField(10);
-    private JTextField txtProductQuantity  = new JTextField(10);
-    private JTextField txtProductDescription  = new JTextField(120);
-    private JTextField txtProductSupplier  = new JTextField(30);
-    private JTextField txtProductUnit  = new JTextField(10);
-    private JTextField txtProductDate  = new JTextField(10);
 
-    private JButton btnAdd = new JButton("Add Product");
-    private JButton btnCheckout = new JButton("Checkout");
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class CheckoutScreen extends JFrame {
+
+    private JButton addBtn = new JButton("Add a new item");
+    private JButton payBtn = new JButton("Finish and Pay");
+    private JButton backButton = new JButton("Back");
+    private JButton exitButton = new JButton("Exit");
+
+    private DefaultTableModel items = new DefaultTableModel();
+
+    private JTable table = new JTable(items); // null, new String[]{"ProductID", "Product Name", "Price", "Quantity", "Cost"});
+    private JLabel totalCost = new JLabel("Total: ");
 
     public CheckoutScreen() {
-        this.setTitle("Checkout Screen");
-        this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
+        exitButton.setPreferredSize(new Dimension(75, 30));
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        exitButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+        backButton.setPreferredSize(new Dimension(75,30));
+        CheckoutScreen thisReference = this;
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                thisReference.setVisible(false);
+                Application.getInstance().getSMSSceen().displayStoreManagementMenu();
+            }
+        });
+        backButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel navPanel = new JPanel();
+        navPanel.setPreferredSize(new Dimension(100, 50));
+
+        navPanel.add(backButton);
+        navPanel.add(exitButton);
+        this.getContentPane().add(navPanel);
+
+        this.setTitle("Checkout");
+        this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
         this.setSize(600, 600);
 
+
+        items.addColumn("Product ID");
+        items.addColumn("Name");
+        items.addColumn("Price");
+        items.addColumn("Quantity");
+        items.addColumn("Cost");
+
+        JPanel panelOrder = new JPanel();
+        panelOrder.setPreferredSize(new Dimension(400, 450));
+        panelOrder.setLayout(new BoxLayout(panelOrder, BoxLayout.PAGE_AXIS));
+        table.setBounds(0, 0, 400, 350);
+        panelOrder.add(table.getTableHeader());
+        panelOrder.add(table);
+        panelOrder.add(totalCost);
+        table.setFillsViewportHeight(true);
+        this.getContentPane().add(panelOrder);
+
+
         JPanel panelButton = new JPanel();
-        panelButton.add(btnAdd);
-        panelButton.add(btnCheckout);
+        panelButton.setPreferredSize(new Dimension(400, 100));
+        panelButton.add(addBtn);
+        panelButton.add(payBtn);
         this.getContentPane().add(panelButton);
-
-        JPanel panelProductID = new JPanel();
-        panelProductID.add(new JLabel("Product ID: "));
-        panelProductID.add(txtProductID);
-        txtProductID.setHorizontalAlignment(JTextField.RIGHT);
-        this.getContentPane().add(panelProductID);
-
-        JPanel panelProductName = new JPanel();
-        panelProductName.add(new JLabel("Product Name: "));
-        panelProductName.add(txtProductName);
-        this.getContentPane().add(panelProductName);
-
-        JPanel panelProductInfo = new JPanel();
-        panelProductInfo.add(new JLabel("Price: "));
-        panelProductInfo.add(txtProductPrice);
-        txtProductPrice.setHorizontalAlignment(JTextField.RIGHT);
-        this.getContentPane().add(panelProductInfo);
-
-        JPanel panelQuantity = new JPanel();
-        panelQuantity.add(new JLabel("Quantity: "));
-        panelQuantity.add(txtProductQuantity);
-        txtProductQuantity.setHorizontalAlignment(JTextField.RIGHT);
-        this.getContentPane().add(panelQuantity);
-
 
     }
 
     public JButton getAddBtn() {
-        return btnAdd;
+        return addBtn;
     }
-    public JButton getCheckoutBtn() {
-        return btnCheckout;
-    }
-
-    public JTextField getTxtProductID() {
-        return txtProductID;
-    }
-    public JTextField getTxtProductName() {
-        return txtProductName;
-    }
-    public JTextField getTxtProductPrice() {
-        return txtProductPrice;
+    public JButton getPayBtn() {
+        return payBtn;
     }
 
+    public JLabel getLabTotal() {
+        return totalCost;
+    }
+
+    public void addRow(Object[] row) {
+        items.addRow(row);
+        items.fireTableDataChanged();
+    }
 }
