@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -14,6 +13,7 @@ public class StoreManagementSystemController implements ActionListener {
         view.getProfileButton().addActionListener(this);
         view.getInventoryButton().addActionListener(this);
         view.getUsersButton().addActionListener(this);
+        view.getLogoutButton().addActionListener(this);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -34,7 +34,12 @@ public class StoreManagementSystemController implements ActionListener {
             Application.getInstance().getStoreManagementSystemView().setVisible(false);
             return;
         } else if (e.getSource() == view.getLogoutButton()) {
-            JOptionPane.showMessageDialog(null,"Login features need to be implemented");
+            Application.setCurrentUser(null);
+            Application.getInstance().getLoginScreenView().getUsernameField().setText("");
+            Application.getInstance().getLoginScreenView().getPasswordField().setText("");
+            Application.getInstance().getLoginScreenView().setVisible(true);
+            Application.getInstance().getStoreManagementSystemView().setVisible(false);
+            return;
         }
     }
 }

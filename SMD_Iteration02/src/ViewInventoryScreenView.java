@@ -1,41 +1,41 @@
-//TODO: Format buttons
 import javax.swing.*;
 import java.awt.*;
 
-public class InventoryScreenView extends JFrame {
+public class ViewInventoryScreenView extends JFrame{
+
     // String Labels/Constants
     private static int PW = 600; private static int PH = 240; // Page width & height dimension
+    private static int LW = 200; private static int LH = 25; // Dimensions for labels on this view.
     private static int BW = 180; private static int BH = 25; // Button width & height dimensions
     private static String pageTitle = "Inventory Management";
 
-    private JButton inventoryButton = new JButton("Manage Inventory");
-    private JButton reportButton = new JButton("Business Report");
     private JButton backButton = new JButton("Back");
+    private JButton addProductButton = new JButton("Add/Search Product");
 
-    public InventoryScreenView() {
+    public ViewInventoryScreenView() {
         this.setTitle(pageTitle);
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(PW, PH);
 
         //Set size of buttons
-        reportButton.setPreferredSize(new Dimension(BW, BH));
-        inventoryButton.setPreferredSize(new Dimension(BW, BH));
         backButton.setPreferredSize(new Dimension(BW, BH));
+        addProductButton.setPreferredSize(new Dimension(BW, BH));
 
-        // Buttons panel
+        // Button panel
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(inventoryButton);
-        buttonPanel.add(reportButton);
-
-        // Back button panel
-        JPanel backButtonPanel = new JPanel();
-        backButtonPanel.add(backButton);
+        buttonPanel.add(backButton);
+        buttonPanel.add(addProductButton);
 
         this.getContentPane().add(buttonPanel);
-        this.getContentPane().add(backButtonPanel);
+
+        //Buttons for individual items are added procedurally in the controller.
     }
-    public JButton getInventoryButton() { return inventoryButton; }
-    public JButton getReportButton() { return reportButton; }
+
     public JButton getBackButton() { return backButton; }
+    public JButton getAddProductButton() { return addProductButton; }
+
+    public int[] getButtonDimensions() {
+            return new int[] {BW, BH};
+        }
 }

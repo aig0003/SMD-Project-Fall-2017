@@ -98,6 +98,11 @@ public class ProductScreenView extends JFrame {
         panelDate.add(productDateText);
         productDateText.setHorizontalAlignment(JTextField.RIGHT);
         this.getContentPane().add(panelDate);
+
+        //Adds instructions for the formatting of the date.
+        JPanel instructionPanel = new JPanel();
+        instructionPanel.add(new JLabel("Date is formatted: yyyy-MM-dd"));
+        this.getContentPane().add(instructionPanel);
     }
 
     public JButton getBackButton() { return backButton;}

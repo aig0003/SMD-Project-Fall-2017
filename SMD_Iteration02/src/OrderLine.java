@@ -1,9 +1,9 @@
 public class OrderLine {
-
     private int productID;
     private int orderID;
     private double quantity;
     private double cost;
+
 
     public double getQuantity() {
         return quantity;
@@ -26,7 +26,7 @@ public class OrderLine {
         this.orderID = orderID;
     }
 
-    public int getID() { return productID; }
+    public int getProductID() { return productID; }
     public void setProductID(int productID) {
         this.productID = productID;
     }

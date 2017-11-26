@@ -1,4 +1,7 @@
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 /**
  * SQLDataAdapter.java
  *
@@ -18,7 +21,6 @@ public class SQLDataAdapter {
         try{
             String selectFromID = "SELECT * FROM StoreItem WHERE ID = " + id;
             Statement stmt = connection.createStatement();
-            System.out.println(selectFromID);
             ResultSet rs = stmt.executeQuery(selectFromID);//Loads product info from SQLDB based on ID inputted.
 
             if(rs.next()){ //steps through loaded result and inputs SQL info of product into java objects.
@@ -30,7 +32,16 @@ public class SQLDataAdapter {
                 product.setDescription(rs.getString(5));
                 product.setSupplier(rs.getString(6));
                 product.setUnit(rs.getString(7));
-                product.setExpiration(rs.getDate(8));
+                try { //Dates are dumb
+                    String date = String.valueOf(rs.getObject(8));
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); //Use M not m so it is months not minutes.
+                    java.util.Date utilDate = formatter.parse(date);
+                    java.sql.Date sqlStartDate = new java.sql.Date(utilDate.getTime());
+                    product.setExpiration(sqlStartDate);
+                } catch (ParseException e) {
+                    System.out.println("Error parsing the date");
+                    e.printStackTrace();
+                }
 
                 rs.close();
                 stmt.close();
@@ -61,7 +72,8 @@ public class SQLDataAdapter {
                 pstmt.setString(5, product.getDescription()); // Description
                 pstmt.setString(6, product.getSupplier());  //Supplier
                 pstmt.setString(7, product.getUnit());      //Measurement
-                pstmt.setDate(8, product.getExpiration());  //Expiration
+                System.out.println(String.valueOf(product.getExpiration()));
+                pstmt.setString(8, String.valueOf(product.getExpiration()));  //Expiration
                 //...
             } else { //Product did not previously exist
                 pstmt = connection.prepareStatement("INSERT INTO StoreItem VALUES (?, ?, ?, ?, ?, ?, ?, ?)"); //...
@@ -88,6 +100,72 @@ public class SQLDataAdapter {
         }
     }
 
+    public Object[] loadOrderLine(int rowNumber) {
+        try{
+            String selectFromRow = "SELECT * FROM OrderCheckout WHERE rowid  = " + rowNumber;
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(selectFromRow);//Loads product info from SQLDB based on ID inputted.
+
+            if(rs.next()){ //steps through loaded result and inputs SQL info of product into java objects.
+                Object[] row = new Object[4];
+                row[0] = rs.getInt(1);
+                row[1] = rs.getInt(2);
+                row[2] = rs.getDouble(3);
+                row[3] = rs.getDouble(4);
+
+                rs.close();
+                stmt.close();
+
+                return row;
+            }
+        } catch(SQLException e) {
+            System.out.println("ERROR: Could not access SQL Database to load row " + rowNumber);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean saveOrder(OrderLine line) {
+        try {
+            String query = "SELECT * FROM StoreItem";
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            ResultSet rs = pstmt.executeQuery();
+
+            pstmt = connection.prepareStatement("INSERT INTO OrderCheckout VALUES (?, ?, ?, ?)");
+            pstmt.setInt(1, line.getOrderID());
+            pstmt.setInt(2, line.getProductID());
+            pstmt.setDouble(3, line.getQuantity());
+            pstmt.setDouble(4, line.getCost());
+
+            pstmt.execute();
+
+            rs.close();
+            pstmt.close();
+            return true;
+        } catch(SQLException e) {
+            System.out.println("ERROR: Could not access SQL Database to save product ");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public int getEntries() {
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM OrderCheckout");
+            rs.next();
+            int rowCount = rs.getInt(1);
+            rs.close() ;
+            stmt.close();
+            return rowCount;
+        } catch(SQLException e) {
+            System.out.println("ERROR: Could not access SQL DB to retrieve number of entries in  OrderCheckout DB");
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
     public Product[] getAll() {
         Product[] result = new Product[0];
         try {
@@ -105,6 +183,8 @@ public class SQLDataAdapter {
             stmt = connection.createStatement();
             rs = stmt.executeQuery(selectAllQuery);
             int count = 0;
+
+
             while (rs.next()) { //steps through loaded result and inputs SQL info of product into java objects.
                 Product product = new Product();
                 product.setID(rs.getInt(1));
@@ -114,7 +194,16 @@ public class SQLDataAdapter {
                 product.setDescription(rs.getString(5));
                 product.setSupplier(rs.getString(6));
                 product.setUnit(rs.getString(7));
-                product.setExpiration(rs.getDate(8));
+                try { //Dates are dumb
+                    String date = String.valueOf(rs.getObject(8));
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); //Use M not m so it is months not minutes.
+                    java.util.Date utilDate = formatter.parse(date);
+                    java.sql.Date sqlStartDate = new java.sql.Date(utilDate.getTime());
+                    product.setExpiration(sqlStartDate);
+                } catch (ParseException e) {
+                    System.out.println("Error parsing the date");
+                    e.printStackTrace();
+                }
                 result[count] = product;
                 count++;
             }
@@ -142,7 +231,7 @@ public class SQLDataAdapter {
                 employee.setName(rs.getString(3));
                 employee.setProfilePicURL(rs.getString(4));
                 if (employee.getProfilePicURL() == null) {
-                    employee.setProfilePicURL("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png");
+                    employee.setProfilePicURL(System.getProperty("user.dir") + "/images/dummy.jpg");
                 }
                 employee.setEmployeeType(rs.getInt(5));
 
@@ -179,7 +268,7 @@ public class SQLDataAdapter {
                 pstmt.setString(1, employee.getUsername());           // username
                 pstmt.setString(2, employee.getPassword());      // password
                 pstmt.setString(3, employee.getName());     //name
-                pstmt.setString(4, "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png");
+                pstmt.setString(4, System.getProperty("user.dir") + "/images/dummy.jpg");
                 pstmt.setInt(5, employee.getEmployeeType()); // employee Type; 0 = Cashier, 1 = Manager
             }
 
@@ -209,6 +298,54 @@ public class SQLDataAdapter {
             System.out.println("ERROR: Could not access SQL Database to cross-reference employee data");
             e.printStackTrace();
             return false;
+        }
+    }
+
+    //
+    // Checks if the given username and password correspond to a user. Then returns the employee.
+    //
+    public Employee tryLogin(String username, String password) {
+        try{
+            String selectFromUsername = "SELECT * FROM Employee WHERE username = '" + username + "' AND password = '" + password + "';";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(selectFromUsername);
+
+            if(rs.next()){ //steps through loaded result and inputs SQL info of employee into java objects.
+                Employee employee = new Employee();
+
+                employee.setUsername(rs.getString(1));
+                employee.setPassword(rs.getString(2));
+                employee.setName(rs.getString(3));
+                employee.setProfilePicURL(rs.getString(4));
+                if (employee.getProfilePicURL() == null) {
+                    employee.setProfilePicURL(System.getProperty("user.dir") + "/images/dummy.jpg");
+                }
+                employee.setEmployeeType(rs.getInt(5));
+
+                rs.close();
+                stmt.close();
+
+                return employee;
+            }
+        } catch(SQLException e) {
+            System.out.println("ERROR: Could not access SQL Database to log in user \"" + username + "\"");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //
+    //Removes an entry from the database for the given id.
+    //
+    public void remove(int itemId) {
+        try {
+            String queryText = "DELETE FROM storeItem WHERE ID = " + itemId + ";";
+            Statement stmt = connection.createStatement();
+            stmt.executeUpdate(queryText);
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("ERROR: Could not access SQL Database");
+            e.printStackTrace();
         }
     }
 

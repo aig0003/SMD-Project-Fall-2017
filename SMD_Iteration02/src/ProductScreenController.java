@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class ProductScreenController implements ActionListener {
     private ProductScreenView view;
@@ -23,8 +25,9 @@ public class ProductScreenController implements ActionListener {
     }
 
     public void back() {
+        clearProduct();
         Application.getInstance().getProductScreenView().setVisible(false);
-        Application.getInstance().getInventoryScreenView().setVisible(true);
+        Application.getInstance().getViewInventoryScreenView().setVisible(true);
     }
 
     public void clearProduct() {
@@ -86,9 +89,18 @@ public class ProductScreenController implements ActionListener {
         String productUnit = view.getProductUnitText().getText().trim(); // Check if unit is valid
         if (productUnit.length() == 0) { JOptionPane.showMessageDialog(null, "Invalid product unit.");return; }
 
+        String dateAsString = view.getProductDateText().getText().trim();
         java.sql.Date productDate = null;
-        //...
-        //Need an exception to handle expiration date
+        if (dateAsString.length() == 0) { JOptionPane.showMessageDialog(null, "Invalid expiration date.");return; }
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date utilDate = formatter.parse(dateAsString);
+            productDate = new java.sql.Date(utilDate.getTime());
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(null, "Invalid expiration date format (use 'MM-DD-YYYY').");
+            e.printStackTrace();
+        }
 
         //Makes an object for this product
         Product product = new Product();

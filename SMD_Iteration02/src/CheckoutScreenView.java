@@ -11,12 +11,13 @@ public class CheckoutScreenView extends JFrame{
     private static String PAGETITLE = "Checkout";
 
     //Buttons
-    private JButton addButton = new JButton("Add new item");
+    private JButton addButton = new JButton("Add item");
+    private JButton removeButton = new JButton("Remove Previous");
     private JButton payButton = new JButton("Finish and Pay");
     private JButton backButton = new JButton("Back");
     //Table
     private DefaultTableModel items = new DefaultTableModel();
-    private JTable table = new JTable(items); // null, new String[]{"ProductID", "Product Name", "Price", "Quantity", "Cost"});
+    private JTable table = new JTable(items);
     //Labels
     private JLabel totalCost = new JLabel("Total: ");
 
@@ -48,24 +49,46 @@ public class CheckoutScreenView extends JFrame{
         JPanel buttonPanel = new JPanel();
         buttonPanel.setPreferredSize(new Dimension(400, 100));
         buttonPanel.add(backButton);
+        buttonPanel.add(removeButton);
         buttonPanel.add(addButton);
         buttonPanel.add(payButton);
         this.getContentPane().add(buttonPanel);
     }
-
+    private int entries = 0;
     public void addRow(Object[] row) {
         items.addRow(row);
         items.fireTableDataChanged();
+        entries++;
+    }
+
+    public void removeRow() {
+        items.removeRow(entries-1);
+        items.fireTableDataChanged();
+        entries--;
+    }
+
+    public String[] getRowAt(int row) {
+        int colNumber = 5;
+        String[] result = new String[colNumber];
+        result[0] = String.valueOf(table.getValueAt(row,0));
+        result[1] = String.valueOf(table.getValueAt(row,1));
+        result[2] = String.valueOf(table.getValueAt(row,2));
+        result[3] = String.valueOf(table.getValueAt(row,3));
+        result[4] = String.valueOf(table.getValueAt(row,4));
+        return result;
     }
 
     // Frame element getters
     public JButton getAddButton() {
         return addButton;
     }
+    public JButton getRemoveButton() { return removeButton; }
     public JButton getPayButton() {
         return payButton;
     }
     public JButton getBackButton() { return backButton; }
     public JLabel getLabTotal() { return totalCost; }
+    public JTable getTable() { return table; }
+    public int getEntries() {return entries;}
 
 }

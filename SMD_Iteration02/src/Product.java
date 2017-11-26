@@ -33,6 +33,7 @@ public class Product {
     public void setUnit(String measurement){this.measurement = measurement;}
 
     public Date getExpiration(){return date;}
-    public void setExpiration(Date date){this.date = date;}
+    public void setExpiration(java.sql.Date date){
+        this.date = date;}
 
 }

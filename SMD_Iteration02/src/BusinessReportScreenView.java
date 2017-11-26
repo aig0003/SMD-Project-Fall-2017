@@ -1,9 +1,15 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.util.ArrayList;
 
-//TODO: Needs to link to find a way to store checkout data and put in a displayable format
+//TODO: Need to read in data from OrderCheckout Table and input it into a table
 public class BusinessReportScreenView extends  JFrame {
+
+    private SQLDataAdapter adapter;
+
     // String labels/Dimension Constants
     private static int PW = 600; private static int PH = 240; // Page width & height dimension
     private static int BW = 100; private static int BH = 25; // Button width & height dimensions
@@ -16,9 +22,11 @@ public class BusinessReportScreenView extends  JFrame {
     //Tables
     private DefaultTableModel items = new DefaultTableModel();
     private JTable table = new JTable(items);
+
     //Labels
 
-    public BusinessReportScreenView() {
+    public BusinessReportScreenView(SQLDataAdapter adapter) {
+        this.adapter = adapter;
         this.setTitle(pageTitle);
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,21 +41,39 @@ public class BusinessReportScreenView extends  JFrame {
         buttonPanel.add(printReportButton);
 
         // Table Columns
-        items.addColumn("Test");
+        items.addColumn("Order ID");
+        items.addColumn("Product ID");
+        items.addColumn("Units Sold");
+        items.addColumn("Revenue");
 
         //Table Panel
         JPanel tablePanel = new JPanel();
         tablePanel.setPreferredSize(new Dimension(400,400));
         tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.PAGE_AXIS));
         table.setBounds(0, 0, 400, 350);
+        table.setAutoCreateRowSorter(true);        //Enables row sorting
         tablePanel.add(table.getTableHeader());
         tablePanel.add(table);
         table.setFillsViewportHeight(true);
-
         JScrollPane scrollableTablePanel = new JScrollPane(tablePanel);
 
         this.getContentPane().add(buttonPanel);
         this.getContentPane().add(scrollableTablePanel, BorderLayout.CENTER);
+    }
+
+    public void loadRows() {
+        //Add data to table
+        int entries = adapter.getEntries();
+        System.out.println(entries);
+        for(int i = 0; i <= entries; i++) {
+            items.addRow(adapter.loadOrderLine(i));
+        }
+        this.invalidate();
+    }
+
+    public void addRow(Object[] row) {
+        items.addRow(row);
+        items.fireTableDataChanged();
     }
 
     public JButton getBackButton() { return backButton; }

@@ -11,7 +11,7 @@ public class BusinessReportScreenController implements ActionListener {
     public BusinessReportScreenController(BusinessReportScreenView view, SQLDataAdapter adapter) {
         this.view = view;
         this.adapter = adapter;
-
+        view.loadRows();
         view.getPrintReportButton().addActionListener(this);
         view.getBackButton().addActionListener(this);
     }

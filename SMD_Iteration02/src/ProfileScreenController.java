@@ -9,8 +9,6 @@ public class ProfileScreenController implements ActionListener {
     private ProfileScreenView view;
     private SQLDataAdapter adapter;
 
-    private String currentUser = "user1";
-
     public ProfileScreenController(ProfileScreenView view, SQLDataAdapter adapter) {
         this.view = view;
         this.adapter = adapter;
@@ -34,23 +32,28 @@ public class ProfileScreenController implements ActionListener {
 
     public void editPhoto() {
         String dir;
-        System.out.println("Old image path: " + view.getImgDir());
+        Employee employee = Application.getCurrentUser();
+
+        System.out.println("Old image path: " + employee.getProfilePicURL());
+
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(System.getProperty("user.home")));
         int result = fc.showOpenDialog(view);
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fc.getSelectedFile();
             dir = selectedFile.getAbsolutePath();
+
             System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+
             String mimetype= new MimetypesFileTypeMap().getContentType(selectedFile);
             String type = mimetype.split("/")[0];
             if(type.equals("image")) {
                 System.out.println("MESSAGE: Selected file approved");
-                view.setImgDir(dir);
-                Employee employee = adapter.loadEmployee(currentUser);
+
                 employee.setProfilePicURL(dir);
                 adapter.saveEmployee(employee);
-                System.out.println("New image path: " + view.getImgDir());
+
+                System.out.println("New image path: " + employee.getProfilePicURL());
                 JOptionPane.showMessageDialog(null, "MESSAGE: Profile picture has been changed! (Requires restart to take effect)");
             } else {
                 JOptionPane.showMessageDialog(null, "ERROR: Selected file is not a .JPEG or .JPG image");
@@ -64,7 +67,8 @@ public class ProfileScreenController implements ActionListener {
 
     public void editPassword() {
         String oldPassword = JOptionPane.showInputDialog(view, "Please enter your old password");
-        Employee employee = adapter.loadEmployee(currentUser);
+        Employee employee = Application.getCurrentUser();
+
         if(Objects.equals(oldPassword, employee.getPassword())) {
             String newPassword = JOptionPane.showInputDialog(view, "Please enter your new password");
             String newPassword2 = JOptionPane.showInputDialog(view, "Please verify new password");

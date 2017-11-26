@@ -22,11 +22,11 @@ public class Application {
     private SQLDataAdapter sqlDataAdapter;
     public SQLDataAdapter getSqlDataAdapter() { return sqlDataAdapter; }
 
-    /*private Employee currentUser;
-    public Employee getCurrentUser() { return currentUser; }
-    public void setCurrentUser(Employee current) { this.currentUser = currentUser; }*/
+    private static Employee currentUser;
+    public static Employee getCurrentUser() { return currentUser; }
+    public static void setCurrentUser(Employee newUser) { currentUser = newUser; }
 
-    //Presentable classes (Views) and their getters
+    //Presentable classes (Views) and their getters. Also creates setters if applicable.
     private ProductScreenView productScreenView = new ProductScreenView();
         public ProductScreenView getProductScreenView() { return productScreenView; }
     private CheckoutScreenView checkoutScreenView = new CheckoutScreenView();
@@ -37,14 +37,19 @@ public class Application {
         public UsersScreenView getUsersScreenView() { return usersScreenView; }
     private StoreManagementSystemView storeManagementSystemView = new StoreManagementSystemView();
         public StoreManagementSystemView getStoreManagementSystemView() { return storeManagementSystemView; }
+        public void setStoreManagementSystemView(StoreManagementSystemView newView) {storeManagementSystemView = newView; }
     private ProfileScreenView profileScreenView;
         public ProfileScreenView getProfileScreenView() { return profileScreenView; }
+        public void setProfileScreenView(ProfileScreenView newView) {profileScreenView = newView; }
     private InventoryScreenView inventoryScreenView = new InventoryScreenView();
         public InventoryScreenView getInventoryScreenView() { return inventoryScreenView; }
-    private BusinessReportScreenView businessReportScreenView = new BusinessReportScreenView();
+    private BusinessReportScreenView businessReportScreenView = new BusinessReportScreenView(sqlDataAdapter);
         public BusinessReportScreenView getBusinessReportScreenView() { return businessReportScreenView; }
+    private ViewInventoryScreenView viewInventoryScreenView;
+        public ViewInventoryScreenView getViewInventoryScreenView() { return viewInventoryScreenView; }
+        public void setViewInventoryScreenView(ViewInventoryScreenView newView) { viewInventoryScreenView = newView; }
 
-    //Controller classes and their getters
+    //Controller classes and their getters. Also gets setters if applicable.
     private ProductScreenController productScreenController;
         public ProductScreenController getProductScreenController() { return productScreenController; }
     private CheckoutScreenController checkoutScreenController;
@@ -55,12 +60,17 @@ public class Application {
         public UsersScreenController getUsersScreenController() { return usersScreenController; }
     private StoreManagementSystemController storeManagementSystemController;
         public StoreManagementSystemController getStoreManagementSystemController() { return storeManagementSystemController; }
+        public void setStoreManagementSystemController(StoreManagementSystemController controllerIn) { storeManagementSystemController = controllerIn; }
     private ProfileScreenController profileScreenController;
         public ProfileScreenController getProfileScreenController() { return profileScreenController; }
+        public void setProfileScreenController(ProfileScreenController controllerIn) { profileScreenController = controllerIn; }
     private InventoryScreenController inventoryScreenController;
         public InventoryScreenController getInventoryScreenController() { return inventoryScreenController; }
     private BusinessReportScreenController businessReportScreenController;
         public BusinessReportScreenController getBusinessReportScreenController() { return businessReportScreenController; }
+    private ViewInventoryScreenController viewInventoryScreenController;
+        public ViewInventoryScreenController getViewInventoryScreenController() { return viewInventoryScreenController; }
+        public void setViewInventoryScreenController(ViewInventoryScreenController newController) { viewInventoryScreenController = newController; }
 
     //Constructor
     private Application() {
@@ -86,8 +96,9 @@ public class Application {
         inventoryScreenView = new InventoryScreenView();
         loginScreenView = new LoginScreenView();
         profileScreenView = new ProfileScreenView(sqlDataAdapter);
-        businessReportScreenView = new BusinessReportScreenView();
+        businessReportScreenView = new BusinessReportScreenView(sqlDataAdapter);
         usersScreenView = new UsersScreenView();
+        viewInventoryScreenView = new ViewInventoryScreenView();
 
         //Creating Controller classes
         storeManagementSystemController = new StoreManagementSystemController(storeManagementSystemView, sqlDataAdapter);
@@ -95,15 +106,16 @@ public class Application {
         productScreenController = new ProductScreenController(productScreenView, sqlDataAdapter);
         checkoutScreenController = new CheckoutScreenController(checkoutScreenView, sqlDataAdapter);
         inventoryScreenController = new InventoryScreenController(inventoryScreenView, sqlDataAdapter);
-        //loginScreenController = new LoginScreenController(loginScreenView, sqlDataAdapter);
+        loginScreenController = new LoginScreenController(loginScreenView, sqlDataAdapter);
         profileScreenController = new ProfileScreenController(profileScreenView, sqlDataAdapter);
         businessReportScreenController = new BusinessReportScreenController(businessReportScreenView, sqlDataAdapter);
+        viewInventoryScreenController = new ViewInventoryScreenController(viewInventoryScreenView, sqlDataAdapter);
 
-        //currentUser = getSqlDataAdapter().loadEmployee("manager"); //...
     }
 
     public static void main(String[] args) {
         //Application.getInstance().getLoginScreenView().setVisible(true);
-        Application.getInstance().getStoreManagementSystemView().setVisible(true);
+        //Application.getInstance().getStoreManagementSystemView().setVisible(true);
+        Application.getInstance().getLoginScreenView().setVisible(true);
     }
 }
