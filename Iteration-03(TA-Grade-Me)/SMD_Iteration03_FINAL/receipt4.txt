@@ -1,0 +1,12 @@
+----------------------------------
+SMD Store
+Order Number: 4
+Cashier: manager
+Date: 2017/12/16 13:09:15
+----------------------------------
+ProdID,  Product,  Quantity,  Price,  Total,  Tax
+100001    Magic Beans    5.00    66.85    334.25    30.08
+----------------------------------
+Total (pre-tax): $334.25
+Total tax: $30.08
+Total: $364.33
