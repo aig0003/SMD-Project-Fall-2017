@@ -72,7 +72,6 @@ public class BusinessReportScreenView extends  JFrame {
         int entries = adapter.getEntries();
         for(int i = 0; i <= entries; i++) {
             items.addRow(adapter.loadOrderLine(i));
-            System.out.println(items.getValueAt(i,3));
             double doub;
             try {
                 doub = Double.parseDouble(items.getValueAt(i,3).toString());
@@ -80,8 +79,6 @@ public class BusinessReportScreenView extends  JFrame {
                 doub = 0;
             }
             items.setValueAt(doub,i,3);
-            System.out.println(items.getValueAt(i,3));
-
         }
         this.invalidate();
     }

@@ -11,7 +11,8 @@ public class CheckoutScreenView extends JFrame{
     //Buttons
     private JButton addButton = new JButton("Add item");
     private JButton removeButton = new JButton("Remove Previous");
-    private JButton payButton = new JButton("Finish and Pay");
+    private JButton printHTMLButton = new JButton("Print .htm Receipt");
+    private JButton printTXTButton = new JButton("Print .txt Receipt");
     private JButton backButton = new JButton("Back");
     //Table
     private DefaultTableModel items = new DefaultTableModel();
@@ -49,7 +50,8 @@ public class CheckoutScreenView extends JFrame{
         buttonPanel.add(backButton);
         buttonPanel.add(removeButton);
         buttonPanel.add(addButton);
-        buttonPanel.add(payButton);
+        buttonPanel.add(printHTMLButton);
+        buttonPanel.add(printTXTButton);
         this.getContentPane().add(buttonPanel);
     }
     private int entries = 0;
@@ -81,9 +83,10 @@ public class CheckoutScreenView extends JFrame{
         return addButton;
     }
     public JButton getRemoveButton() { return removeButton; }
-    public JButton getPayButton() {
-        return payButton;
+    public JButton getPrintHTMLButton() {
+        return printHTMLButton;
     }
+    public JButton getPrintTXTButton() { return printTXTButton; }
     public JButton getBackButton() { return backButton; }
     public JLabel getLabTotal() { return totalCost; }
     public JTable getTable() { return table; }

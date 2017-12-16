@@ -21,7 +21,6 @@ public class ProductScreenController implements ActionListener {
         if (e.getSource() == view.getLoadButton()) { loadProduct(); }
         else if (e.getSource() == view.getSaveButton()) {
             //Saves the data and then reloads the view and controller.
-
             saveProduct();
         }
         else if(e.getSource() == view.getClearButton()) { clearProduct(); }
@@ -127,6 +126,8 @@ public class ProductScreenController implements ActionListener {
         Application.getInstance().setProductScreenController(new ProductScreenController(Application.getInstance().getProductScreenView(), adapter));
         Application.getInstance().setInventoryScreenView(new InventoryScreenView());
         Application.getInstance().setInventoryScreenController(new InventoryScreenController(Application.getInstance().getInventoryScreenView(), adapter));
+        Application.getInstance().setViewInventoryScreenView(new ViewInventoryScreenView());
+        Application.getInstance().setViewInventoryScreenController(new ViewInventoryScreenController(Application.getInstance().getViewInventoryScreenView(), adapter));
         Application.getInstance().getProductScreenView().setVisible(true);
     }
 }

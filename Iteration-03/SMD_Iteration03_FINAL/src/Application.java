@@ -16,6 +16,9 @@ public class Application {
     private SQLDataAdapter sqlDataAdapter;
     public SQLDataAdapter getSqlDataAdapter() { return sqlDataAdapter; }
 
+    private static ReceiptBuilder TXTBuilder = new ReceiptTXTBuilder();
+    private static ReceiptBuilder HTMLBuilder = new ReceiptHTMLBuilder();
+
     private static Employee currentUser;
     public static Employee getCurrentUser() { return currentUser; }
     public static void setCurrentUser(Employee newUser) { currentUser = newUser; }
@@ -91,7 +94,7 @@ public class Application {
         storeManagementSystemController = new StoreManagementSystemController(storeManagementSystemView, sqlDataAdapter);
         usersScreenController = new UsersScreenController(usersScreenView, sqlDataAdapter);
         productScreenController = new ProductScreenController(productScreenView, sqlDataAdapter);
-        checkoutScreenController = new CheckoutScreenController(checkoutScreenView, sqlDataAdapter);
+        checkoutScreenController = new CheckoutScreenController(checkoutScreenView, sqlDataAdapter, TXTBuilder, HTMLBuilder);
         inventoryScreenController = new InventoryScreenController(inventoryScreenView, sqlDataAdapter);
         loginScreenController = new LoginScreenController(loginScreenView, sqlDataAdapter);
         profileScreenController = new ProfileScreenController(profileScreenView, sqlDataAdapter);
